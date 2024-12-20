@@ -13,7 +13,7 @@ Module.register("MMM-google-route", {
 	language: "en",
         directionsRequest:{},
         fontSize:undefined,
-        listen:[]
+        listen:['CALENDAR_EVENTS']
     },
 
     state: {
@@ -60,6 +60,8 @@ Module.register("MMM-google-route", {
         age.style.textAlign = 'right';
         age.classList.add('small','dimmed');
 
+
+
         main.appendChild(title);
 	if(this.config.showMap)
 	        main.appendChild(wrapper);
@@ -85,14 +87,16 @@ Module.register("MMM-google-route", {
             var directionsDisplay0 = new google.maps.DirectionsRenderer({
                 suppressMarkers : true,
                 polylineOptions:{
-                    strokeColor:'#fff',
-                    strokeWeight:7
+                    strokeColor: '#0000FF', //'#fff',
+                    strokeOpacity: 0.7,
+                    strokeWeight:5
                 }
             });
             var directionsDisplay1 = new google.maps.DirectionsRenderer({
                 suppressMarkers : true,
                 polylineOptions:{
-                    strokeColor:'#aaa',
+                    strokeColor: '#FFA500', // Change color to orange // strokeColor:'#aaa',
+                    strokeOpacity: 0.6,
                     strokeWeight:5
                 }
             });
@@ -106,6 +110,8 @@ Module.register("MMM-google-route", {
                   minimumRefreshPeriod is useful when used in combination with listened events,
                   such as USER_PRESENCE.
                 */
+                
+                Log.info("XXX --> getDirections called");
                 if (
                     self.config.minimumRefreshPeriod &&
                     (Date.now() - lastDirectionsTime < self.config.minimumRefreshPeriod * 1000 * 60)
@@ -134,11 +140,17 @@ Module.register("MMM-google-route", {
                         dr.provideRouteAlternatives=true;
                     if(self.state.overrideDestination){
                         dr.destination = self.state.overrideDestination;
+                        var titleElement = document.getElementById("title");
+                        if (titleElement) {
+                            titleElement.innerHTML = dr.destination;
+                        }
                     }
                     directionsService.route(
                         dr,
                         function(response, status) {
                             if (status === 'OK') {
+                                console.log("XXX --> getDirections response = ", response);    
+                                //console.log("XXX --> getDirections response = ", JSON.stringify(response, null, 2));
                                 directionsDisplay1.setDirections(response);
                                 directionsDisplay1.setRouteIndex(1);
                                 directionsDisplay0.setDirections(response);
@@ -234,6 +246,7 @@ Module.register("MMM-google-route", {
             departure.style.fontSize = self.config.fontSize;
 
             var leg = response.routes[index].legs[0];
+            
             if(leg.duration_in_traffic)
                 duration.innerHTML = leg.duration_in_traffic.text;
             else
@@ -242,7 +255,31 @@ Module.register("MMM-google-route", {
                 departure.innerHTML = leg.departure_time.text;
             distance.innerHTML = leg.distance.text;
             summary.innerHTML = response.routes[index].summary;
+            
+            // console.log("XXX --> leg.departure_time = " + leg.departure_time.text);
+            // console.log("XXX --> index = ",index);
+            // console.log("XXX --> leg.duration = " + leg.duration_in_traffic.text);
+            
+                        
+            if (leg.duration_in_traffic) {
+                var now = new Date();
+                var timePlus3Minutes = new Date(now.getTime() + 3 * 60 * 1000); // Add 3 minutes in milliseconds    
+                var durationTime = leg.duration_in_traffic.value * 1000; // Duration in milliseconds
+                var arrivalTime = new Date(timePlus3Minutes.getTime() + durationTime); // Add duration to departure time
+                //var arrivalTime = timePlus3Minutes + durationTime; // Add duration to departure time
 
+
+                // console.log("XXX -->timePlus3Minutes = ",timePlus3Minutes);
+                // console.log("XXX -->durationTime = ",durationTime);
+                // console.log("XXX -->arrivalTime = ",arrivalTime);
+                // console.log("XXX -->arrivalTime.toLocaleTimeString() = ",arrivalTime.toLocaleTimeString()); 
+
+                summary.innerHTML = "-->" + arrivalTime.toLocaleTimeString();
+            } else {
+                summary.innerHTML = "N/A";
+            }
+                        
+            
             function addCell(tr,classname,content){
                 var cell = document.createElement("td");
                 if(classname)cell.classList.add(classname);
@@ -286,13 +323,16 @@ Module.register("MMM-google-route", {
         // Let's see if we can handle destination override
         if (notification === "CALENDAR_EVENTS") {
             // Ok, we should be able to handle this
-            for (var e in payload) {
-                var event = payload[e];
-                if(event.location){
+            //this.Log.info("XXX--> CALENDAR_EVENTS received")
+            console.log("XXX--> CALENDAR_EVENTS received, payload = ")
+            
+            if (payload && payload.events) {
+                payload.events.forEach(event => {
+                    console.log("Event Location: ", event.location);
                     override = event.location;
-                }
-                if(override)break;
+                });
             }
+
         } else {
             // No destination override, just update the route.
             this.getDirections();
