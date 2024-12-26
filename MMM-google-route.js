@@ -272,17 +272,27 @@ Module.register("MMM-google-route", {
                 var timePlus3Minutes = new Date(now.getTime() + 3 * 60 * 1000); // Add 3 minutes in milliseconds    
                 var durationTime = leg.duration_in_traffic.value * 1000; // Duration in milliseconds
                 var arrivalTime = new Date(timePlus3Minutes.getTime() + durationTime); // Add duration to departure time
-                //var arrivalTime = timePlus3Minutes + durationTime; // Add duration to departure time
+                
 
 
-                // console.log("XXX -->timePlus3Minutes = ",timePlus3Minutes);
-                // console.log("XXX -->durationTime = ",durationTime);
-                // console.log("XXX -->arrivalTime = ",arrivalTime);
-                // console.log("XXX -->arrivalTime.toLocaleTimeString() = ",arrivalTime.toLocaleTimeString()); 
 
-                summary.innerHTML = "&#8594;" + arrivalTime.toLocaleTimeString();
+                function roundToFullMinutes(date) {
+                    date.setSeconds(0, 0); // Set seconds and milliseconds to zero
+                    return date;
+                }
+                
+                var roundedArrivalTime = roundToFullMinutes(arrivalTime);
+                //summary.innerHTML = "<span style='font-size: xx-large;'>&#8594;</span>" + roundedArrivalTime.toLocaleTimeString();
+                summary.innerHTML = "<span style='font-size: xx-large;'>&#8594;</span>" + roundedArrivalTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                summary.innerHTML = "<span style='font-size: xx-large; font-weight: bold;'>&#8594;</span>" + roundedArrivalTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                summary.style.textAlign = "right"; // Align summary to the right
+                summary.style.fontWeight = "bold"; // Make summary bold
+                
+               
             } else {
                 summary.innerHTML = "N/A";
+                summary.style.textAlign = "right"; // Align summary to the right
+                summary.style.fontWeight = "bold"; // Make summary bold
             }
                         
             
