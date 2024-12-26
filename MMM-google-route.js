@@ -39,6 +39,7 @@ Module.register("MMM-google-route", {
         title.setAttribute("id", "title");
         title.style.width="100%";
         title.style.fontSize=this.config.fontSize;
+        title.style.color = "white"; // Set the text color to white
         title.innerHTML=this.config.title;
 
         var wrapper = document.createElement("div");
@@ -182,6 +183,7 @@ Module.register("MMM-google-route", {
             function updateAge() {
                 if(self.config.showAge && self.lastRefresh){
                     age.innerHTML = self.lastRefresh.fromNow();
+                    age.style.color = "purple"; // Set the text color to purple
                 }
             }
             if(self.config.showAge && !self.state.ageTimer){
@@ -232,9 +234,13 @@ Module.register("MMM-google-route", {
             var table = infoTable;
             var tr = document.createElement("tr");
             var summary = document.createElement("span");
+            summary.style.color = "orange";
             var distance = document.createElement("span");
+            distance.style.color = "orange";
             var duration = document.createElement("span");
+            duration.style.color = "orange";
             var departure = document.createElement("span");
+            departure.style.color = "orange";
 
             if(index==0){
                 tr.classList.add("bright");
@@ -274,7 +280,7 @@ Module.register("MMM-google-route", {
                 // console.log("XXX -->arrivalTime = ",arrivalTime);
                 // console.log("XXX -->arrivalTime.toLocaleTimeString() = ",arrivalTime.toLocaleTimeString()); 
 
-                summary.innerHTML = "-->" + arrivalTime.toLocaleTimeString();
+                summary.innerHTML = "&#8594;" + arrivalTime.toLocaleTimeString();
             } else {
                 summary.innerHTML = "N/A";
             }
