@@ -262,10 +262,6 @@ Module.register("MMM-google-route", {
             distance.innerHTML = leg.distance.text;
             summary.innerHTML = response.routes[index].summary;
             
-            // console.log("XXX --> leg.departure_time = " + leg.departure_time.text);
-            // console.log("XXX --> index = ",index);
-            // console.log("XXX --> leg.duration = " + leg.duration_in_traffic.text);
-            
                         
             if (leg.duration_in_traffic) {
                 var now = new Date();
@@ -273,18 +269,7 @@ Module.register("MMM-google-route", {
                 var durationTime = leg.duration_in_traffic.value * 1000; // Duration in milliseconds
                 var arrivalTime = new Date(timePlus3Minutes.getTime() + durationTime); // Add duration to departure time
                 
-
-
-
-                function roundToFullMinutes(date) {
-                    date.setSeconds(0, 0); // Set seconds and milliseconds to zero
-                    return date;
-                }
-                
-                var roundedArrivalTime = roundToFullMinutes(arrivalTime);
-                //summary.innerHTML = "<span style='font-size: xx-large;'>&#8594;</span>" + roundedArrivalTime.toLocaleTimeString();
-                summary.innerHTML = "<span style='font-size: xx-large;'>&#8594;</span>" + roundedArrivalTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                summary.innerHTML = "<span style='font-size: xx-large; font-weight: bold;'>&#8594;</span>" + roundedArrivalTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                summary.innerHTML = "<span style='font-size: xx-large; font-weight: bold;'>&#8594;</span>" + arrivalTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 summary.style.textAlign = "right"; // Align summary to the right
                 summary.style.fontWeight = "bold"; // Make summary bold
                 
